@@ -78,14 +78,7 @@ class _HomePageState extends State<HomePage> {
             onChanged: _filterProducts,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mic, color: Colors.white),
-            onPressed: () {
-              // Voice search functionality
-            },
-          ),
-        ],
+        actions: [],
       ),
       body: Consumer<ProductProvider>(
         builder: (context, productProvider, child) {
