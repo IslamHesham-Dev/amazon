@@ -9,7 +9,7 @@ class SampleProducts {
       description:
           '''FORGED IN TITANIUM — iPhone 15 Pro Max has a strong and light aerospace-grade titanium design with a textured matte-glass back. It also features a Ceramic Shield front that's tougher than any smartphone glass. And it's splash, water, and dust resistant.''',
       imageUrls: [
-        'https://m.media-amazon.com/images/I/81+k+eSPZOL._AC_SL1500_.jpg',
+        'https://m.media-amazon.com/images/I/616mZZm8-7L.__AC_SX300_SY300_QL70_FMwebp_.jpg',
         'https://m.media-amazon.com/images/I/7177Zgc1zEL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/81AFZn4H3OL._AC_SL1500_.jpg'
       ],
@@ -23,7 +23,7 @@ class SampleProducts {
       description:
           '''CAPTURE STUNNING CONTENT: Create professional quality content with the pro-grade camera system; The highest camera resolution on a phone, the 200MP camera adapted and improved pixel binning technology that captures brilliant details even in low light.''',
       imageUrls: [
-        'https://m.media-amazon.com/images/I/71Tt0EByGOL._AC_SL1500_.jpg',
+        'https://m.media-amazon.com/images/I/51MpKU9XowL._AC_SX425_.jpg',
         'https://m.media-amazon.com/images/I/71dG5ddP-rL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/71hIjJfR6PL._AC_SL1500_.jpg'
       ],
@@ -79,7 +79,7 @@ class SampleProducts {
       description:
           '''Intense brightness, infinite contrast, and a picture that appears to float on air with self-lit OLED pixels that can turn off completely for perfect black.''',
       imageUrls: [
-        'https://m.media-amazon.com/images/I/81AdaSxFi2L._AC_SL1500_.jpg',
+        'https://m.media-amazon.com/images/I/71ReKg-3YrL._AC_SX355_.jpg',
         'https://m.media-amazon.com/images/I/81l3FcKhurL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/81qjCrEI3NL._AC_SL1500_.jpg'
       ],
@@ -93,7 +93,7 @@ class SampleProducts {
       description:
           '''Dyson's most powerful, intelligent cordless vacuum. Engineered to detect hidden dust as small as 10 microns and equipped with an acoustic piezo sensor to enable scientific proof of what's been removed.''',
       imageUrls: [
-        'https://m.media-amazon.com/images/I/51+Cp-dZiCL._AC_SL1500_.jpg',
+        'https://m.media-amazon.com/images/I/619XJLzSXJL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/61guSJ2CXSL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/61TuL9XP41L._AC_SL1500_.jpg'
       ],
@@ -107,7 +107,7 @@ class SampleProducts {
       description:
           '''The world's best noise cancellation earbuds: The QuietComfort Earbuds II use Bose noise cancellation technology to drastically minimize outside noises, so you hear only your music.''',
       imageUrls: [
-        'https://m.media-amazon.com/images/I/514mZYm3kDL._AC_SL1500_.jpg',
+        'https://m.media-amazon.com/images/I/51K77J9rCjL._AC_SY355_.jpg',
         'https://m.media-amazon.com/images/I/51Ptj5WvrQL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/61PVpg-mJXL._AC_SL1500_.jpg'
       ],
@@ -121,7 +121,7 @@ class SampleProducts {
       description:
           '''VIBRANT VIEWING EXPERIENCE: Both work and play shine on the 12.4" Dynamic AMOLED 2X display; Experience near-cinematic viewing with incredible brilliance, contrast and brightness; Plus, Vision Booster automatically optimizes for indoor and outdoor lighting.''',
       imageUrls: [
-        'https://m.media-amazon.com/images/I/81zXm2n+qvL._AC_SL1500_.jpg',
+        'https://m.media-amazon.com/images/I/71wf0FpPBcL._AC_SX355_.jpg',
         'https://m.media-amazon.com/images/I/71rYnZ9YqCL._AC_SL1500_.jpg',
         'https://m.media-amazon.com/images/I/717XrExZWwL._AC_SL1500_.jpg'
       ],

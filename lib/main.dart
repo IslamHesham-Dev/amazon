@@ -79,6 +79,15 @@ class AuthWrapper extends StatelessWidget {
 class MainNavigationWrapper extends StatefulWidget {
   const MainNavigationWrapper({super.key});
 
+  // Static method to navigate to specific tab
+  static void navigateTo(BuildContext context, int index) {
+    final state =
+        context.findRootAncestorStateOfType<_MainNavigationWrapperState>();
+    if (state != null) {
+      state._onItemTapped(index);
+    }
+  }
+
   @override
   State<MainNavigationWrapper> createState() => _MainNavigationWrapperState();
 }
@@ -109,7 +118,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFF7CA00),
+        selectedItemColor: const Color(0xFF232F3E),
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         items: const [

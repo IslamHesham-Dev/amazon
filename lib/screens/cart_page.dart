@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/cart_item.dart';
 import '../providers/cart_provider.dart';
 import '../screens/checkout_page.dart';
+import '../main.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -72,8 +73,8 @@ class _CartPageState extends State<CartPage> {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      // Navigate back to home page
-                      Navigator.of(context).pop();
+                      // Navigate to home page tab (index 0)
+                      MainNavigationWrapper.navigateTo(context, 0);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFF7CA00),
@@ -169,6 +170,20 @@ class _CartPageState extends State<CartPage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to home page tab (index 0)
+                        MainNavigationWrapper.navigateTo(context, 0);
+                      },
+                      child: const Text(
+                        'Continue shopping',
+                        style: TextStyle(
+                          color: Color(0xFF232F3E),
+                          fontSize: 14,
                         ),
                       ),
                     ),
