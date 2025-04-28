@@ -1,114 +1,104 @@
-# Amazon Clone
+# AmazonClone
 
-A Flutter app that mimics Amazon's look and functionality. Uses Firebase for authentication and data storage.
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+
+## Description
+
+AmazonClone is a feature-rich mobile application that replicates the core functionality and user experience of Amazon's shopping platform. The app provides users with a familiar e-commerce interface including product browsing, detailed product views, shopping cart management, user authentication, promotions, and user profile management. This project focuses on delivering a smooth and intuitive shopping experience while leveraging Firebase for backend services.
+
+## Demo Video
+
+[▶ Watch the Demo](https://drive.google.com/drive/folders/1y_792XrJxw127S98qwtz7qoTgutfuHHr?usp=sharing)
 
 ## Features
 
-- User authentication (login/registration)
-- Product listing and search
-- Product detail view
-- Shopping cart
-- Ratings and reviews
-- Promotions page
-- User profile management
+- **User Authentication**
+  - Email and password-based signup and login
+  - Secure authentication via Firebase Auth
+  - User profile management and preferences
+  
+- **Product Browsing & Search**
+  - Home page with categorized product listings
+  - Search functionality with filters
+  - Dynamic product recommendations
+  
+- **Product Details**
+  - Comprehensive product information
+  - Multiple product images
+  - Customer reviews and ratings
+  - Related product suggestions
+  
+- **Shopping Cart**
+  - Add/remove products
+  - Adjust quantities
+  - Persistent cart across sessions
+  - Checkout flow
+  
+- **Promotions & Deals**
+  - Special offers and discounts
+  - Deal of the day
+  - Category-specific promotions
+  - Time-limited offers
+  
+- **User Profile**
+  - Order history
+  - Account settings
+  - Payment methods
+  - Shipping addresses
+  
+- **Navigation**
+  - Bottom navigation bar for main sections
+  - Intuitive UI flow between screens
 
-## Setup
+## Tech Stack
 
-### 1. Flutter Setup
+- **Frontend**
+  - Flutter (UI Framework)
+  - Dart (Programming Language)
+  - Provider (State Management)
+  
+- **Backend Services**
+  - Firebase Authentication
+  - Cloud Firestore (NoSQL Database)
+  - Firebase Core
+  
+- **Additional Packages**
+  - flutter_rating_bar (for product ratings)
+  - cached_network_image (for efficient image loading)
+  - intl (for formatting dates and currency)
+  - url_launcher (for external links)
 
-Make sure you have Flutter installed on your machine. If not, follow the official [Flutter installation guide](https://flutter.dev/docs/get-started/install).
+## Usage
 
-```bash
-# Check Flutter installation
-flutter doctor
-```
+1. **Getting Started**
+   - Launch the app and create an account or login with existing credentials
+   - Browse the home page to discover featured products and deals
 
-### 2. Firebase Setup
+2. **Shopping Experience**
+   - Browse products by category or use the search functionality
+   - Tap on a product to view details, specifications, and reviews
+   - Add items to your cart and adjust quantities as needed
+   - Continue shopping or proceed to checkout
 
-This app uses Firebase for authentication and cloud storage. You need to set up a Firebase project:
+3. **Deals & Promotions**
+   - Navigate to the Deals tab to discover special offers
+   - Browse by category to find specific deals
+   - "Deal of the Day" showcases limited-time offers
 
-1. Go to [Firebase Console](https://console.firebase.google.com/) and create a new project
-2. Set up Authentication with Email/Password sign-in enabled
-3. Create a Firestore database with the following collections:
-   - `products`: For storing product information
-   - `carts`: For storing user cart information
-   - `feedbacks`: For storing product reviews
-   - `promotions`: For storing promotional offers
+4. **Cart & Checkout**
+   - Review your cart items and adjust quantities
+   - Proceed to checkout to complete your purchase
+   - Add shipping information and payment details
 
-### 3. Connect Firebase to Your App
+5. **User Profile**
+   - Manage your account information
+   - View order history and track deliveries
+   - Update payment methods and shipping addresses
 
-#### Android Setup:
-1. Add your Android app to Firebase project and download `google-services.json`
-2. Place the file in `android/app/` directory
-3. Ensure your `android/build.gradle` has the Google services plugin:
-   ```groovy
-   buildscript {
-       dependencies {
-           classpath 'com.google.gms:google-services:4.3.15'
-       }
-   }
-   ```
-4. Also ensure your `android/app/build.gradle` has:
-   ```groovy
-   apply plugin: 'com.google.gms.google-services'
-   ```
+## Acknowledgments
 
-#### iOS Setup:
-1. Add your iOS app to Firebase project and download `GoogleService-Info.plist`
-2. Place the file in `ios/Runner/` directory using Xcode
-3. Open `ios/Runner.xcworkspace` with Xcode, right-click on Runner directory > Add files to "Runner"
-4. Select the downloaded `GoogleService-Info.plist` file
-
-### 4. Install Dependencies
-
-```bash
-flutter pub get
-```
-
-### 5. Run the App
-
-```bash
-flutter run
-```
-
-## Project Structure
-
-```
-lib/
-  ├── models/        # Data models
-  ├── providers/     # State management
-  ├── screens/       # App screens
-  ├── services/      # Firebase services
-  ├── widgets/       # Reusable widgets
-  ├── main.dart      # App entry point
-  └── firebase_options.dart # Firebase config
-```
-
-## Sample Data
-
-Use the following structure to add sample data to your Firestore collections:
-
-### Products
-```json
-{
-  "name": "Product Name",
-  "price": 99.99,
-  "description": "Detailed product description...",
-  "imageUrls": [
-    "https://example.com/image1.jpg",
-    "https://example.com/image2.jpg"
-  ],
-  "rating": 4.5,
-  "reviewCount": 120
-}
-```
-
-### Promotions
-```json
-{
-  "title": "Special Offer",
-  "description": "Get 20% off on all electronics",
-  "imageUrl": "https://example.com/promo-banner.jpg",
-  "expiryDate": "Timestamp (date)"
-}
-```
+- UI/UX design inspired by Amazon's mobile application
+- Icons and design elements from various open-source libraries
+- Special thanks to the Flutter and Firebase communities for their excellent documentation and support
