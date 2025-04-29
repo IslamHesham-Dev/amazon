@@ -258,14 +258,59 @@ class CartItemWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '\$${item.product.price.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: Color(0xFFB12704),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+
+                // Price display
+                if (item.product.discountedPrice != null)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        '\$${item.product.discountedPrice!.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Color(0xFFB12704),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '\$${item.product.price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: Text(
+                          '${item.product.discountPercent}% OFF',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    '\$${item.product.price.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Color(0xFFB12704),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
+
                 const SizedBox(height: 4),
                 const Text(
                   'In Stock',

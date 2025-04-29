@@ -4,6 +4,7 @@ import '../models/sample_products.dart';
 
 class ProductProvider extends ChangeNotifier {
   List<Product> _products = [];
+  List<Product> _discountedProducts = [];
   bool _isLoading = false;
   String? _error;
 
@@ -31,10 +32,35 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
+  // Add method to store discounted products (called from PromotionsPage)
+  void storeDiscountedProduct(Product product) {
+    // Check if product already exists in the list
+    int existingIndex =
+        _discountedProducts.indexWhere((p) => p.id == product.id);
+
+    if (existingIndex >= 0) {
+      // Replace existing product
+      _discountedProducts[existingIndex] = product;
+    } else {
+      // Add new product
+      _discountedProducts.add(product);
+    }
+  }
+
   // Method to get product by ID
-  Future<Product?> getProductById(String productId) async {
+  Future<Product> getProductById(String productId) async {
     try {
-      // First check if it's already in our list
+      // First check if it's in our discounted products list
+      final discountedProduct = _discountedProducts.firstWhere(
+        (p) => p.id == productId,
+        orElse: () => null as Product,
+      );
+
+      if (discountedProduct != null) {
+        return discountedProduct;
+      }
+
+      // Then check if it's in our regular products list
       if (_products.isNotEmpty) {
         final product = _products.firstWhere(
           (p) => p.id == productId,
@@ -57,7 +83,7 @@ class ProductProvider extends ChangeNotifier {
       return product;
     } catch (e) {
       _setError(e.toString());
-      return null;
+      rethrow;
     }
   }
 

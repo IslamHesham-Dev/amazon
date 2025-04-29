@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../models/sample_products.dart';
+import '../providers/product_provider.dart';
 import 'product_detail_page.dart';
 
 class PromotionsPage extends StatefulWidget {
@@ -23,7 +25,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
 
   void _prepareDealProducts() {
     // Create a list of products with discount information
-    final List<Product> dealsProducts = [
+    List<Product> dealsProducts = [
       // Add some products from SampleProducts
       SampleProducts.products.firstWhere((p) => p.id == '3'), // Sony Headphones
       SampleProducts.products.firstWhere((p) => p.id == '8'), // Bose Earbuds
@@ -109,48 +111,65 @@ class _PromotionsPageState extends State<PromotionsPage> {
       ),
     ];
 
-    // Apply discounts to products
-    _dealProducts = dealsProducts
-        .map((product) {
-          // Apply different discount percentages based on product ID
-          int discountPercent = 0;
+    // Create copies of products with discount information
+    List<Product> discountedProducts = [];
+    for (var product in dealsProducts) {
+      // Apply different discount percentages based on product ID
+      int discountPercent = 0;
 
-          // Existing products
-          if (product.id == '3') {
-            discountPercent = 35; // Sony Headphones
-          } else if (product.id == '8') {
-            discountPercent = 25; // Bose Earbuds
-          }
-          // New products
-          else if (product.id == 'deal1') {
-            discountPercent = 40; // Instant Pot
-          } else if (product.id == 'deal2') {
-            discountPercent = 15; // Apple Watch
-          } else if (product.id == 'deal3') {
-            discountPercent = 30; // Fitbit
-          } else if (product.id == 'deal4') {
-            discountPercent = 20; // Logitech Mouse
-          } else if (product.id == 'deal5') {
-            discountPercent = 45; // Philips Sonicare
-          } else if (product.id == 'deal6') {
-            discountPercent = 25; // Samsung Monitor
-          }
+      // Existing products
+      if (product.id == '3') {
+        discountPercent = 35; // Sony Headphones
+      } else if (product.id == '8') {
+        discountPercent = 25; // Bose Earbuds
+      }
+      // New products
+      else if (product.id == 'deal1') {
+        discountPercent = 40; // Instant Pot
+      } else if (product.id == 'deal2') {
+        discountPercent = 15; // Apple Watch
+      } else if (product.id == 'deal3') {
+        discountPercent = 30; // Fitbit
+      } else if (product.id == 'deal4') {
+        discountPercent = 20; // Logitech Mouse
+      } else if (product.id == 'deal5') {
+        discountPercent = 45; // Philips Sonicare
+      } else if (product.id == 'deal6') {
+        discountPercent = 25; // Samsung Monitor
+      }
 
-          if (discountPercent > 0) {
-            double discountedPrice =
-                product.price * (1 - discountPercent / 100);
-            return {
-              'product': product,
-              'discountPercent': discountPercent,
-              'originalPrice': product.price,
-              'discountedPrice': discountedPrice,
-              'category': _getCategoryForProduct(product),
-            };
-          }
-          return null;
-        })
-        .whereType<Map<String, dynamic>>()
-        .toList();
+      if (discountPercent > 0) {
+        double discountedPrice = product.price * (1 - discountPercent / 100);
+
+        // Create a new product with discount info
+        Product discountedProduct = Product(
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          description: product.description,
+          imageUrls: product.imageUrls,
+          rating: product.rating,
+          reviewCount: product.reviewCount,
+          discountPercent: discountPercent,
+          discountedPrice: discountedPrice,
+        );
+
+        discountedProducts.add(discountedProduct);
+
+        // Store this product in the ProductProvider for access by ProductDetailPage
+        final productProvider =
+            Provider.of<ProductProvider>(context, listen: false);
+        productProvider.storeDiscountedProduct(discountedProduct);
+      }
+    }
+
+    // Apply category information
+    _dealProducts = discountedProducts.map((product) {
+      return {
+        'product': product,
+        'category': _getCategoryForProduct(product),
+      };
+    }).toList();
 
     _filterProductsByCategory(_selectedCategory);
   }
@@ -335,7 +354,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.7,
+                            childAspectRatio: 0.63,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
                           ),
@@ -343,19 +362,12 @@ class _PromotionsPageState extends State<PromotionsPage> {
                             (context, index) {
                               final dealData = _filteredDealProducts[index];
                               final product = dealData['product'] as Product;
-                              final discountPercent =
-                                  dealData['discountPercent'] as int;
-                              final originalPrice =
-                                  dealData['originalPrice'] as double;
-                              final discountedPrice =
-                                  dealData['discountedPrice'] as double;
+                              final category = dealData['category'] as String;
 
                               return _buildDealProductCard(
                                 context,
                                 product: product,
-                                discountPercent: discountPercent,
-                                originalPrice: originalPrice,
-                                discountedPrice: discountedPrice,
+                                category: category,
                               );
                             },
                             childCount: _filteredDealProducts.length,
@@ -390,12 +402,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
   Widget _buildDealProductCard(
     BuildContext context, {
     required Product product,
-    required int discountPercent,
-    required double originalPrice,
-    required double discountedPrice,
+    required String category,
   }) {
-    final String category = _getCategoryForProduct(product);
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -438,29 +446,30 @@ class _PromotionsPageState extends State<PromotionsPage> {
                 ),
 
                 // Discount badge
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
+                if (product.discountPercent != null)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          bottomRight: Radius.circular(8),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      '$discountPercent% OFF',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                      child: Text(
+                        '${product.discountPercent}% OFF',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
                 // Category badge
                 Positioned(
@@ -490,46 +499,23 @@ class _PromotionsPageState extends State<PromotionsPage> {
 
             // Product details
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Product name
                   Text(
                     product.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
 
-                  // Price information
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '\$${discountedPrice.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Color(0xFFB12704),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '\$${originalPrice.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          decoration: TextDecoration.lineThrough,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Rating
-                  const SizedBox(height: 4),
+                  // Rating moved here (below product name)
                   Row(
                     children: [
                       const Icon(Icons.star, size: 16, color: Colors.amber),
@@ -546,6 +532,41 @@ class _PromotionsPageState extends State<PromotionsPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+
+                  // Price information
+                  if (product.discountedPrice != null)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '\$${product.discountedPrice!.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Color(0xFFB12704),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '\$${product.price.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFFB12704),
+                      ),
+                    ),
                 ],
               ),
             ),

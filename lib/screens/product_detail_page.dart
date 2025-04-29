@@ -4,6 +4,8 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../providers/product_provider.dart';
 import 'rating_feedback_page.dart';
+import '../main.dart';
+import 'cart_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -46,7 +48,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        _error = 'Failed to load product: ${e.toString()}';
         _isLoading = false;
       });
     }
@@ -63,6 +65,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         content: Text('${_product!.name} added to cart'),
         duration: const Duration(seconds: 2),
       ),
+    );
+  }
+
+  void _buyNow() {
+    if (_product == null) return;
+
+    // 1. Add to cart
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    cartProvider.addToCart(_product!);
+
+    // 2. Navigate directly to the cart page using push
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CartPage()),
     );
   }
 
@@ -243,13 +259,55 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
                                 // Price
                                 const SizedBox(height: 16),
-                                Text(
-                                  '\$${_product!.price.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFB12704),
-                                  ),
+                                Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  children: [
+                                    // Show discounted price if available
+                                    Text(
+                                      _product!.discountedPrice != null
+                                          ? '\$${_product!.discountedPrice!.toStringAsFixed(2)}'
+                                          : '\$${_product!.price.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFB12704),
+                                      ),
+                                    ),
+
+                                    // Show original price and discount percent if there's a discount
+                                    if (_product!.discountPercent != null) ...[
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '\$${_product!.price.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          '${_product!.discountPercent}% OFF',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 const Text(
@@ -286,9 +344,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                 SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton(
-                                    onPressed: () {
-                                      // Implement buy now functionality
-                                    },
+                                    onPressed: _buyNow,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFFFF9900),
                                       padding: const EdgeInsets.symmetric(
