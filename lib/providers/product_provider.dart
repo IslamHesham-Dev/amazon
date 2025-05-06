@@ -51,36 +51,32 @@ class ProductProvider extends ChangeNotifier {
   Future<Product> getProductById(String productId) async {
     try {
       // First check if it's in our discounted products list
-      final discountedProduct = _discountedProducts.firstWhere(
-        (p) => p.id == productId,
-        orElse: () => null as Product,
-      );
-
-      if (discountedProduct != null) {
-        return discountedProduct;
-      }
-
-      // Then check if it's in our regular products list
-      if (_products.isNotEmpty) {
-        final product = _products.firstWhere(
-          (p) => p.id == productId,
-          orElse: () => null as Product,
-        );
-
-        if (product != null) {
+      for (final product in _discountedProducts) {
+        if (product.id == productId) {
           return product;
         }
       }
 
-      // Otherwise get from sample data
+      // Then check if it's in our regular products list
+      if (_products.isNotEmpty) {
+        for (final product in _products) {
+          if (product.id == productId) {
+            return product;
+          }
+        }
+      }
+
+      // Otherwise check sample data
       await Future.delayed(const Duration(milliseconds: 300));
 
-      final product = SampleProducts.products.firstWhere(
-        (p) => p.id == productId,
-        orElse: () => null as Product,
-      );
+      for (final product in SampleProducts.products) {
+        if (product.id == productId) {
+          return product;
+        }
+      }
 
-      return product;
+      // If we get here, no product was found
+      throw Exception("Product not found with ID: $productId");
     } catch (e) {
       _setError(e.toString());
       rethrow;

@@ -42,10 +42,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Provider.of<ProductProvider>(context, listen: false);
       final product = await productProvider.getProductById(widget.productId);
 
-      setState(() {
-        _product = product;
-        _isLoading = false;
-      });
+      if (product != null) {
+        setState(() {
+          _product = product;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'Product not found';
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _error = 'Failed to load product: ${e.toString()}';
