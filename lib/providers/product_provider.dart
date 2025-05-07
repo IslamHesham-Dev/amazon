@@ -87,43 +87,66 @@ class ProductProvider extends ChangeNotifier {
   List<Product> getProductsByCategory(String category) {
     category = category.toLowerCase();
 
-    // Create categories based on product names or descriptions
+    // Specific product IDs for certain categories
+    final audioProductIds = ['3', '8']; // Sony headphones, Bose earbuds
+    final tabletProductIds = ['9', '10']; // Samsung Tab, Kindle
+    final gamingProductIds = ['5']; // Nintendo Switch
+
+    // Create categories based on product names, descriptions, or specific product IDs
     if (category == 'phone' ||
         category == 'phones' ||
         category == 'smartphone') {
-      return _products
-          .where((p) =>
-              p.name.toLowerCase().contains('phone') ||
-              p.name.toLowerCase().contains('iphone') ||
-              p.name.toLowerCase().contains('galaxy'))
-          .toList();
+      return _products.where((p) {
+        final name = p.name.toLowerCase();
+        return ((name.contains('phone') && !name.contains('headphone')) ||
+                name.contains('iphone') ||
+                (name.contains('galaxy') && !name.contains('tab'))) &&
+            !audioProductIds.contains(p.id);
+      }).toList();
     } else if (category == 'tablet' || category == 'tablets') {
-      return _products
-          .where((p) =>
-              p.name.toLowerCase().contains('tablet') ||
-              p.name.toLowerCase().contains('ipad') ||
-              p.name.toLowerCase().contains('tab'))
-          .toList();
+      return _products.where((p) {
+        final name = p.name.toLowerCase();
+        return (name.contains('tablet') ||
+            name.contains('ipad') ||
+            name.contains(' tab ') ||
+            name.contains('tab s') ||
+            name.contains('kindle') ||
+            tabletProductIds.contains(p.id));
+      }).toList();
     } else if (category == 'tv' || category == 'television') {
-      return _products
-          .where((p) =>
-              p.name.toLowerCase().contains('tv') ||
-              p.name.toLowerCase().contains('television'))
-          .toList();
+      return _products.where((p) {
+        final name = p.name.toLowerCase();
+        return name.contains('tv') || name.contains('television');
+      }).toList();
     } else if (category == 'audio' || category == 'headphones') {
-      return _products
-          .where((p) =>
-              p.name.toLowerCase().contains('headphone') ||
-              p.name.toLowerCase().contains('earbuds') ||
-              p.name.toLowerCase().contains('audio'))
-          .toList();
+      return _products.where((p) {
+        final name = p.name.toLowerCase();
+        return (name.contains('headphone') ||
+                name.contains('earbuds') ||
+                name.contains('audio') ||
+                name.contains('sony wh') ||
+                name.contains('bose') ||
+                name.contains('quietcomfort') ||
+                audioProductIds.contains(p.id)) &&
+            !name.contains('nintendo');
+      }).toList();
     } else if (category == 'laptop' || category == 'computer') {
-      return _products
-          .where((p) =>
-              p.name.toLowerCase().contains('macbook') ||
-              p.name.toLowerCase().contains('laptop') ||
-              p.name.toLowerCase().contains('computer'))
-          .toList();
+      return _products.where((p) {
+        final name = p.name.toLowerCase();
+        return name.contains('macbook') ||
+            name.contains('laptop') ||
+            name.contains('computer');
+      }).toList();
+    } else if (category == 'gaming') {
+      return _products.where((p) {
+        final name = p.name.toLowerCase();
+        return name.contains('nintendo') ||
+            name.contains('switch') ||
+            name.contains('playstation') ||
+            name.contains('xbox') ||
+            name.contains('gaming') ||
+            gamingProductIds.contains(p.id);
+      }).toList();
     } else {
       // Return all products if category doesn't match
       return _products;

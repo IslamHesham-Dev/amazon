@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/wishlist_provider.dart';
 import '../screens/orders_page.dart';
+import '../screens/wishlist_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -139,6 +141,22 @@ class ProfilePage extends StatelessWidget {
                       },
                     ),
                     const Divider(),
+                    Consumer<WishlistProvider>(
+                      builder: (context, wishlistProvider, child) {
+                        final count = wishlistProvider.wishlistItems.length;
+                        return _buildSettingsButtonWithBadge(
+                          context,
+                          'Your Saved Items',
+                          Icons.favorite_border,
+                          count > 0 ? count.toString() : null,
+                          () {
+                            // Navigate to wishlist page
+                            Navigator.pushNamed(context, '/wishlist');
+                          },
+                        );
+                      },
+                    ),
+                    const Divider(),
                     _buildSettingsButton(
                       context,
                       'Your Addresses',
@@ -248,6 +266,56 @@ class ProfilePage extends StatelessWidget {
                 fontSize: 16,
               ),
             ),
+            const Spacer(),
+            Icon(
+              Icons.chevron_right,
+              color: Colors.grey.shade700,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsButtonWithBadge(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String? badgeText,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.grey.shade700),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            if (badgeText != null) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeText,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
             const Spacer(),
             Icon(
               Icons.chevron_right,

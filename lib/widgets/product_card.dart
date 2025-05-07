@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
+import 'wishlist_button.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -13,32 +14,55 @@ class ProductCard extends StatelessWidget {
 
   String _getProductCategory() {
     final name = product.name.toLowerCase();
+    final description = product.description.toLowerCase();
 
-    if (name.contains('phone') ||
+    // Check for specific product matches first
+    if (product.id == '3' ||
+        name.contains('sony wh') ||
+        name.contains('bose')) {
+      return 'Audio';
+    }
+
+    if (product.id == '9' || name.contains('galaxy tab')) {
+      return 'Tablet';
+    }
+
+    if (product.id == '10' || name.contains('kindle')) {
+      return 'Tablet';
+    }
+
+    if (name.contains('nintendo') ||
+        name.contains('switch') ||
+        name.contains('playstation') ||
+        name.contains('xbox')) {
+      return 'Gaming';
+    }
+
+    // Then use general category detection
+    if ((name.contains('phone') && !name.contains('headphone')) ||
         name.contains('iphone') ||
-        name.contains('galaxy')) {
+        (name.contains('galaxy') && !name.contains('tab'))) {
       return 'Phone';
     } else if (name.contains('tablet') ||
         name.contains('ipad') ||
-        name.contains('tab')) {
+        name.contains(' tab ') ||
+        name.contains('tab s')) {
       return 'Tablet';
     } else if (name.contains('tv') || name.contains('television')) {
       return 'TV';
     } else if (name.contains('headphone') ||
         name.contains('earbuds') ||
-        name.contains('audio')) {
+        name.contains('audio') ||
+        name.contains('quietcomfort')) {
       return 'Audio';
     } else if (name.contains('macbook') ||
         name.contains('laptop') ||
         name.contains('computer')) {
       return 'Laptop';
-    } else if (name.contains('nintendo') ||
-        name.contains('playstation') ||
-        name.contains('xbox') ||
-        name.contains('gaming')) {
-      return 'Gaming';
-    } else if (name.contains('kindle') || name.contains('book')) {
+    } else if (name.contains('book') && !name.contains('macbook')) {
       return 'Books';
+    } else if (name.contains('vacuum') || name.contains('cleaner')) {
+      return 'Home';
     } else {
       return 'Other';
     }
@@ -111,6 +135,15 @@ class ProductCard extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                    ),
+                  ),
+                  // Add wishlist button
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: WishlistButton(
+                      product: product,
+                      size: 18,
                     ),
                   ),
                 ],

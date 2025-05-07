@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/product.dart';
+import '../providers/product_provider.dart';
 
 enum SortOption {
   priceHighToLow,
@@ -34,6 +36,7 @@ class _ProductFiltersState extends State<ProductFilters> {
     'Audio',
     'Laptop',
     'Gaming',
+    'Home',
   ];
 
   // Filter state
@@ -66,13 +69,17 @@ class _ProductFiltersState extends State<ProductFilters> {
 
     // Apply category filter
     if (_selectedCategory != 'All') {
-      filteredProducts = filteredProducts.where((product) {
-        final name = product.name.toLowerCase();
-        final description = product.description.toLowerCase();
-        final category = _selectedCategory.toLowerCase();
+      final productProvider =
+          Provider.of<ProductProvider>(context, listen: false);
 
-        return name.contains(category) || description.contains(category);
-      }).toList();
+      // Use the provider's getProductsByCategory method for consistent filtering
+      final categoryProducts =
+          productProvider.getProductsByCategory(_selectedCategory);
+      final categoryProductIds = categoryProducts.map((p) => p.id).toSet();
+
+      filteredProducts = filteredProducts
+          .where((product) => categoryProductIds.contains(product.id))
+          .toList();
     }
 
     // Apply price range filter

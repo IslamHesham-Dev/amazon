@@ -8,11 +8,13 @@ import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/promo_provider.dart';
 import 'providers/order_provider.dart';
+import 'providers/wishlist_provider.dart';
 import 'screens/cart_page.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
 import 'screens/profile_page.dart';
 import 'screens/promotions_page.dart';
+import 'screens/wishlist_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => PromoProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
       ],
       child: MaterialApp(
         title: 'Amazon Clone',
@@ -43,6 +46,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const AuthWrapper(),
+        routes: {
+          '/wishlist': (context) => const WishlistPage(),
+        },
       ),
     );
   }

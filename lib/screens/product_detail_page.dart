@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../providers/product_provider.dart';
+import '../widgets/wishlist_button.dart';
 import 'rating_feedback_page.dart';
 import '../main.dart';
 import 'cart_page.dart';
@@ -96,6 +97,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         title: const Text('Product Details'),
         backgroundColor: const Color(0xFF232F3E),
         foregroundColor: Colors.white,
+        actions: [
+          if (_product != null)
+            WishlistButton(
+              product: _product!,
+              iconColor: Colors.white,
+              showBackground: false,
+            ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -219,12 +228,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Title
-                                Text(
-                                  _product!.name,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        _product!.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // Add wishlist button next to the product name
+                                    WishlistButton(
+                                      product: _product!,
+                                      size: 24,
+                                      showBackground: false,
+                                    ),
+                                  ],
                                 ),
 
                                 // Rating
