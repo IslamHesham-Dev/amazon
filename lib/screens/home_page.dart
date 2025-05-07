@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_card.dart';
+import '../widgets/filter_button.dart';
+import '../widgets/sort_button.dart';
 import 'product_detail_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,6 +17,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   List<Product> _filteredProducts = [];
+  List<Product> _displayedProducts = [];
+  bool _isFiltering = false;
 
   @override
   void initState() {
@@ -44,6 +48,30 @@ class _HomePageState extends State<HomePage> {
                 product.description.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
+
+      // Apply displayed products based on current filter state
+      _updateDisplayedProducts();
+    });
+  }
+
+  void _updateDisplayedProducts() {
+    setState(() {
+      _displayedProducts =
+          _isFiltering ? _displayedProducts : _filteredProducts;
+    });
+  }
+
+  void _handleFilterChanged(List<Product> filteredProducts) {
+    setState(() {
+      _displayedProducts = filteredProducts;
+      _isFiltering = true;
+    });
+  }
+
+  void _handleSortChanged(List<Product> sortedProducts) {
+    setState(() {
+      _displayedProducts = sortedProducts;
+      _isFiltering = true;
     });
   }
 
@@ -69,6 +97,9 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         _searchController.clear();
                         _filterProducts('');
+                        setState(() {
+                          _isFiltering = false;
+                        });
                       },
                     )
                   : null,
@@ -78,7 +109,28 @@ class _HomePageState extends State<HomePage> {
             onChanged: _filterProducts,
           ),
         ),
-        actions: [],
+        actions: [
+          Consumer<ProductProvider>(
+            builder: (context, productProvider, child) {
+              return SortButton(
+                products: _isFiltering
+                    ? _displayedProducts
+                    : (_searchController.text.isEmpty
+                        ? productProvider.products
+                        : _filteredProducts),
+                onSortChanged: _handleSortChanged,
+              );
+            },
+          ),
+          Consumer<ProductProvider>(
+            builder: (context, productProvider, child) {
+              return FilterButton(
+                products: productProvider.products,
+                onFilterChanged: _handleFilterChanged,
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer<ProductProvider>(
         builder: (context, productProvider, child) {
@@ -102,9 +154,12 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          final products = _searchController.text.isEmpty
-              ? productProvider.products
-              : _filteredProducts;
+          // Determine which products to display based on search and filters
+          final products = _isFiltering
+              ? _displayedProducts
+              : (_searchController.text.isEmpty
+                  ? productProvider.products
+                  : _filteredProducts);
 
           if (products.isEmpty) {
             return const Center(
@@ -112,30 +167,60 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return ProductCard(
-                product: product,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailPage(productId: product.id),
-                    ),
-                  );
-                },
-              );
-            },
+          return Column(
+            children: [
+              if (_isFiltering)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  color: Colors.grey.shade100,
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Filtered results',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _isFiltering = false;
+                            _filterProducts(_searchController.text);
+                          });
+                        },
+                        child: const Text('Clear Filters'),
+                      ),
+                    ],
+                  ),
+                ),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.7,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return ProductCard(
+                      product: product,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProductDetailPage(productId: product.id),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),

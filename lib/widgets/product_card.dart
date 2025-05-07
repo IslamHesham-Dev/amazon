@@ -11,8 +11,43 @@ class ProductCard extends StatelessWidget {
     required this.onTap,
   });
 
+  String _getProductCategory() {
+    final name = product.name.toLowerCase();
+
+    if (name.contains('phone') ||
+        name.contains('iphone') ||
+        name.contains('galaxy')) {
+      return 'Phone';
+    } else if (name.contains('tablet') ||
+        name.contains('ipad') ||
+        name.contains('tab')) {
+      return 'Tablet';
+    } else if (name.contains('tv') || name.contains('television')) {
+      return 'TV';
+    } else if (name.contains('headphone') ||
+        name.contains('earbuds') ||
+        name.contains('audio')) {
+      return 'Audio';
+    } else if (name.contains('macbook') ||
+        name.contains('laptop') ||
+        name.contains('computer')) {
+      return 'Laptop';
+    } else if (name.contains('nintendo') ||
+        name.contains('playstation') ||
+        name.contains('xbox') ||
+        name.contains('gaming')) {
+      return 'Gaming';
+    } else if (name.contains('kindle') || name.contains('book')) {
+      return 'Books';
+    } else {
+      return 'Other';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final category = _getProductCategory();
+
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
@@ -21,39 +56,65 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product image
+            // Product image with category badge
             Expanded(
-              child: product.imageUrls.isNotEmpty
-                  ? Image.network(
-                      product.imageUrls[0],
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  product.imageUrls.isNotEmpty
+                      ? Image.network(
+                          product.imageUrls[0],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey.shade200,
+                              child: const Center(
+                                child:
+                                    Icon(Icons.image_not_supported, size: 50),
+                              ),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
                           color: Colors.grey.shade200,
                           child: const Center(
                             child: Icon(Icons.image_not_supported, size: 50),
                           ),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                    )
-                  : Container(
-                      color: Colors.grey.shade200,
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported, size: 50),
+                        ),
+                  Positioned(
+                    top: 4,
+                    left: 4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        category,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                  ),
+                ],
+              ),
             ),
 
             // Product info
@@ -86,13 +147,36 @@ class ProductCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  if (product.discountedPrice != null)
+                    Row(
+                      children: [
+                        Text(
+                          '\$${product.discountedPrice!.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.red,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '\$${product.price.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      '\$${product.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
