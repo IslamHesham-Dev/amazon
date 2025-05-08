@@ -8,6 +8,7 @@ import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/promo_provider.dart';
 import 'providers/order_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/cart_page.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
@@ -34,15 +35,19 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => PromoProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'Amazon Clone',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF232F3E)),
-          scaffoldBackgroundColor: Colors.grey.shade100,
-          useMaterial3: true,
-        ),
-        home: const AuthWrapper(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            key: ValueKey(themeProvider.themeMode),
+            title: 'Amazon Clone',
+            themeMode: themeProvider.themeMode,
+            theme: themeProvider.theme,
+            darkTheme: themeProvider.theme,
+            home: const AuthWrapper(),
+          );
+        },
       ),
     );
   }
@@ -110,6 +115,8 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -118,8 +125,10 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF232F3E),
-        unselectedItemColor: Colors.grey,
+        backgroundColor: isDarkMode ? Colors.grey.shade900 : Colors.white,
+        selectedItemColor:
+            isDarkMode ? const Color(0xFFF7CA00) : const Color(0xFF232F3E),
+        unselectedItemColor: isDarkMode ? Colors.grey.shade400 : Colors.grey,
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(

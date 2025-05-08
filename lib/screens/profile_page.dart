@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 import '../screens/orders_page.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Account'),
-        backgroundColor: const Color(0xFF232F3E),
-        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -99,8 +104,14 @@ class ProfilePage extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFF7CA00),
+                        foregroundColor: Colors.black,
                       ),
-                      child: const Text('Try Prime Free'),
+                      child: const Text(
+                        'Try Prime Free',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -165,6 +176,8 @@ class ProfilePage extends StatelessWidget {
                         // Navigate to change password page
                       },
                     ),
+                    const Divider(),
+                    _buildDarkModeToggle(context),
                   ],
                 ),
               ),
@@ -181,8 +194,9 @@ class ProfilePage extends StatelessWidget {
                         await authProvider.signOut();
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
-                  foregroundColor: Colors.black87,
+                  backgroundColor:
+                      isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
+                  foregroundColor: isDarkMode ? Colors.white : Colors.black87,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: authProvider.isLoading
@@ -203,28 +217,32 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildInfoRow(String label, String? value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade700,
+    return Builder(
+      builder: (context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade400
+                    : Colors.grey.shade700,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          child: Text(
-            value ?? 'Not available',
-            style: const TextStyle(
-              fontSize: 16,
+          Expanded(
+            child: Text(
+              value ?? 'Not available',
+              style: const TextStyle(
+                fontSize: 16,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -234,13 +252,17 @@ class ProfilePage extends StatelessWidget {
     IconData icon,
     VoidCallback onTap,
   ) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
           children: [
-            Icon(icon, color: Colors.grey.shade700),
+            Icon(icon,
+                color:
+                    isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700),
             const SizedBox(width: 16),
             Text(
               title,
@@ -251,12 +273,45 @@ class ProfilePage extends StatelessWidget {
             const Spacer(),
             Icon(
               Icons.chevron_right,
-              color: Colors.grey.shade700,
+              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildDarkModeToggle(BuildContext context) {
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, _) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(
+              themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade400
+                  : Colors.grey.shade700,
+            ),
+            const SizedBox(width: 16),
+            Text(
+              themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+            const Spacer(),
+            Switch(
+              value: themeProvider.isDarkMode,
+              onChanged: (_) {
+                themeProvider.toggleTheme();
+              },
+              activeColor: const Color(0xFFF7CA00),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   String? _formatDate(DateTime? date) {
