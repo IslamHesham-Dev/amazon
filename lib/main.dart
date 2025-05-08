@@ -14,6 +14,7 @@ import 'screens/home_page.dart';
 import 'screens/login_page.dart';
 import 'screens/profile_page.dart';
 import 'screens/promotions_page.dart';
+import 'services/deep_link_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,6 +100,7 @@ class MainNavigationWrapper extends StatefulWidget {
 
 class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
   int _selectedIndex = 0;
+  final DeepLinkService _deepLinkService = DeepLinkService();
 
   static const List<Widget> _pages = [
     HomePage(),
@@ -106,6 +108,21 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
     PromotionsPage(),
     ProfilePage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize deep link service after the build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _deepLinkService.initialize(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    _deepLinkService.dispose();
+    super.dispose();
+  }
 
   void _onItemTapped(int index) {
     setState(() {

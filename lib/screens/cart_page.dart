@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:clipboard/clipboard.dart';
 import '../models/cart_item.dart';
 import '../providers/cart_provider.dart';
 import '../screens/checkout_page.dart';
@@ -29,6 +31,20 @@ class _CartPageState extends State<CartPage> {
         title: const Text('Shopping Cart'),
         backgroundColor: const Color(0xFF232F3E),
         foregroundColor: Colors.white,
+        actions: [
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, _) {
+              if (cartProvider.items.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return IconButton(
+                icon: const Icon(Icons.share),
+                onPressed: () => _shareCart(context, cartProvider),
+                tooltip: 'Share Cart',
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer<CartProvider>(
         builder: (context, cartProvider, child) {
@@ -193,6 +209,53 @@ class _CartPageState extends State<CartPage> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  void _shareCart(BuildContext context, CartProvider cartProvider) {
+    if (cartProvider.items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot share an empty cart')),
+      );
+      return;
+    }
+
+    // Generate the encoded cart string
+    final encodedCart = cartProvider.encodeCartForSharing();
+    final shareUrl = 'https://amazonclone.app/cart?data=$encodedCart';
+
+    // Show sharing options
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.share),
+            title: const Text('Share Cart Link'),
+            onTap: () {
+              Navigator.pop(context);
+              Share.share(
+                'Check out my Amazon cart: $shareUrl',
+                subject: 'My Amazon Cart',
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.copy),
+            title: const Text('Copy Link to Clipboard'),
+            onTap: () {
+              Navigator.pop(context);
+              FlutterClipboard.copy(shareUrl).then((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Cart link copied to clipboard')),
+                );
+              });
+            },
+          ),
+        ],
       ),
     );
   }

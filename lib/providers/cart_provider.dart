@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
 import '../models/cart_item.dart';
 import '../models/product.dart';
 
@@ -57,6 +58,69 @@ class CartProvider extends ChangeNotifier {
   void clearCart() {
     _items.clear();
     notifyListeners();
+  }
+
+  // Cart sharing functionality
+  String encodeCartForSharing() {
+    // Create a shareable format of the cart
+    final cartData = {
+      'items': _items.map((item) => item.toJson()).toList(),
+    };
+
+    // Encode to JSON and then to base64 for safe sharing
+    return base64Encode(utf8.encode(jsonEncode(cartData)));
+  }
+
+  void importSharedCart(String encodedCart) {
+    try {
+      // Decode the shared cart data
+      final String jsonStr = utf8.decode(base64Decode(encodedCart));
+      final Map<String, dynamic> cartData = jsonDecode(jsonStr);
+
+      final List<dynamic> itemsData = cartData['items'] as List<dynamic>;
+      final List<CartItem> newItems = itemsData
+          .map((item) => CartItem.fromJson(item as Map<String, dynamic>))
+          .toList();
+
+      // Replace the current cart with the imported one
+      _items.clear();
+      _items.addAll(newItems);
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to import cart: $e');
+    }
+  }
+
+  // Merge a shared cart with the current cart
+  void mergeSharedCart(String encodedCart) {
+    try {
+      // Decode the shared cart data
+      final String jsonStr = utf8.decode(base64Decode(encodedCart));
+      final Map<String, dynamic> cartData = jsonDecode(jsonStr);
+
+      final List<dynamic> itemsData = cartData['items'] as List<dynamic>;
+      final List<CartItem> sharedItems = itemsData
+          .map((item) => CartItem.fromJson(item as Map<String, dynamic>))
+          .toList();
+
+      // Add each shared item to the cart
+      for (var sharedItem in sharedItems) {
+        final existingItemIndex = _items
+            .indexWhere((item) => item.product.id == sharedItem.product.id);
+
+        if (existingItemIndex >= 0) {
+          // Item already in cart, update quantity
+          _items[existingItemIndex].quantity += sharedItem.quantity;
+        } else {
+          // Add new item to cart
+          _items.add(sharedItem);
+        }
+      }
+
+      notifyListeners();
+    } catch (e) {
+      _setError('Failed to merge cart: $e');
+    }
   }
 
   // Simulate fetching cart from storage (we're just using in-memory data)
