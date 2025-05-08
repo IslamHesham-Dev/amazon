@@ -66,6 +66,10 @@ class Order {
   final String paymentMethod;
   final DateTime orderDate;
   final OrderStatus status;
+  final bool isGift;
+  final String? giftRecipientName;
+  final String? giftMessage;
+  final bool giftWrapped;
 
   Order({
     String? id,
@@ -76,6 +80,10 @@ class Order {
     required this.paymentMethod,
     DateTime? orderDate,
     this.status = OrderStatus.pending,
+    this.isGift = false,
+    this.giftRecipientName,
+    this.giftMessage,
+    this.giftWrapped = false,
   })  : id = id ?? const Uuid().v4(),
         orderDate = orderDate ?? DateTime.now();
 
@@ -97,6 +105,10 @@ class Order {
       'paymentMethod': paymentMethod,
       'orderDate': orderDate.toIso8601String(),
       'status': status.name,
+      'isGift': isGift,
+      'giftRecipientName': giftRecipientName,
+      'giftMessage': giftMessage,
+      'giftWrapped': giftWrapped,
     };
   }
 
@@ -112,6 +124,10 @@ class Order {
       paymentMethod: json['paymentMethod'],
       orderDate: DateTime.parse(json['orderDate']),
       status: OrderStatus.fromString(json['status']),
+      isGift: json['isGift'] ?? false,
+      giftRecipientName: json['giftRecipientName'],
+      giftMessage: json['giftMessage'],
+      giftWrapped: json['giftWrapped'] ?? false,
     );
   }
 }

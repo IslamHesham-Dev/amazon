@@ -115,6 +115,28 @@ class _OrdersPageState extends State<OrdersPage> {
                                   color: Colors.grey.shade600,
                                 ),
                               ),
+                              if (order.isGift)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.card_giftcard,
+                                        size: 14,
+                                        color: Colors.redAccent,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Gift Order',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                             ],
                           ),
                           Container(

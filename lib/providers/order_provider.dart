@@ -34,8 +34,16 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Place a new order
-  Future<Order?> placeOrder(List<CartItem> cartItems, double totalAmount,
-      String address, String paymentMethod) async {
+  Future<Order?> placeOrder(
+    List<CartItem> cartItems,
+    double totalAmount,
+    String address,
+    String paymentMethod, {
+    bool isGift = false,
+    String? giftRecipientName,
+    String? giftMessage,
+    bool giftWrapped = false,
+  }) async {
     _setLoading(true);
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -61,6 +69,10 @@ class OrderProvider extends ChangeNotifier {
         shippingAddress: address,
         paymentMethod: paymentMethod,
         status: OrderStatus.processing,
+        isGift: isGift,
+        giftRecipientName: giftRecipientName,
+        giftMessage: giftMessage,
+        giftWrapped: giftWrapped,
       );
 
       // Add to orders list
@@ -104,16 +116,22 @@ class OrderProvider extends ChangeNotifier {
         return false;
       }
 
+      final existingOrder = _orders[orderIndex];
+
       // Create a new order with canceled status
       final updatedOrder = Order(
-        id: _orders[orderIndex].id,
+        id: existingOrder.id,
         userId: user.uid,
-        items: _orders[orderIndex].items,
-        totalAmount: _orders[orderIndex].totalAmount,
-        shippingAddress: _orders[orderIndex].shippingAddress,
-        paymentMethod: _orders[orderIndex].paymentMethod,
-        orderDate: _orders[orderIndex].orderDate,
+        items: existingOrder.items,
+        totalAmount: existingOrder.totalAmount,
+        shippingAddress: existingOrder.shippingAddress,
+        paymentMethod: existingOrder.paymentMethod,
+        orderDate: existingOrder.orderDate,
         status: OrderStatus.canceled,
+        isGift: existingOrder.isGift,
+        giftRecipientName: existingOrder.giftRecipientName,
+        giftMessage: existingOrder.giftMessage,
+        giftWrapped: existingOrder.giftWrapped,
       );
 
       // Replace the old order with the updated one

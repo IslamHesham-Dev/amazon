@@ -14,8 +14,13 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   final _formKey = GlobalKey<FormState>();
   final _addressController = TextEditingController();
+  final _giftRecipientController = TextEditingController();
+  final _giftMessageController = TextEditingController();
+
   String _selectedPaymentMethod = 'Credit Card';
   bool _isProcessing = false;
+  bool _isGift = false;
+  bool _giftWrapped = false;
 
   final List<String> _paymentMethods = [
     'Credit Card',
@@ -27,6 +32,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void dispose() {
     _addressController.dispose();
+    _giftRecipientController.dispose();
+    _giftMessageController.dispose();
     super.dispose();
   }
 
@@ -45,11 +52,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
       // Get cart items and total price
       final cartItems = cartProvider.items;
-      final totalAmount = cartProvider.totalPrice;
+      final totalAmount = cartProvider.totalPrice + (_giftWrapped ? 4.99 : 0);
 
       // Place order
-      final order = await orderProvider.placeOrder(cartItems, totalAmount,
-          _addressController.text.trim(), _selectedPaymentMethod);
+      final order = await orderProvider.placeOrder(
+        cartItems,
+        totalAmount,
+        _addressController.text.trim(),
+        _selectedPaymentMethod,
+        isGift: _isGift,
+        giftRecipientName:
+            _isGift ? _giftRecipientController.text.trim() : null,
+        giftMessage: _isGift ? _giftMessageController.text.trim() : null,
+        giftWrapped: _giftWrapped,
+      );
 
       if (order != null && mounted) {
         // Clear cart after successful order
@@ -80,6 +96,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final cartItems = cartProvider.items;
+    final double subtotal = cartProvider.totalPrice;
+    final double giftWrapPrice = _giftWrapped ? 4.99 : 0;
+    final double totalAmount = subtotal + giftWrapPrice;
 
     return Scaffold(
       appBar: AppBar(
@@ -142,6 +161,46 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                           const Divider(),
 
+                          // Subtotal
+                          Row(
+                            children: [
+                              const Expanded(
+                                child: Text(
+                                  'Subtotal:',
+                                ),
+                              ),
+                              Text(
+                                '\$${subtotal.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // Gift wrap fee if applied
+                          if (_giftWrapped) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Expanded(
+                                  child: Text(
+                                    'Gift Wrap:',
+                                  ),
+                                ),
+                                Text(
+                                  '\$${giftWrapPrice.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+
+                          const SizedBox(height: 8),
+                          const Divider(),
+
                           // Total
                           Row(
                             children: [
@@ -154,7 +213,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
                               Text(
-                                '\$${cartProvider.totalPrice.toStringAsFixed(2)}',
+                                '\$${totalAmount.toStringAsFixed(2)}',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -191,6 +250,103 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Gift Options
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                'Buy as a Gift',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Spacer(),
+                              Switch(
+                                value: _isGift,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isGift = value;
+                                  });
+                                },
+                                activeColor: const Color(0xFFF7CA00),
+                              ),
+                            ],
+                          ),
+                          if (_isGift) ...[
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _giftRecipientController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Recipient Name',
+                                hintText: 'Enter recipient\'s name',
+                              ),
+                              validator: (value) {
+                                if (_isGift &&
+                                    (value == null || value.isEmpty)) {
+                                  return 'Please enter recipient\'s name';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _giftMessageController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Gift Message',
+                                hintText: 'Enter optional gift message',
+                              ),
+                              maxLines: 3,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Gift Wrapping',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Add gift wrap for \$4.99',
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Switch(
+                                  value: _giftWrapped,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _giftWrapped = value;
+                                    });
+                                  },
+                                  activeColor: const Color(0xFFF7CA00),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -234,9 +390,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                       child: _isProcessing
                           ? const CircularProgressIndicator()
-                          : const Text(
-                              'Place Order',
-                              style: TextStyle(
+                          : Text(
+                              _isGift ? 'Buy as Gift' : 'Place Order',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
